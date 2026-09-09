@@ -1,89 +1,389 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>컬러턴 - 2인용</title>
+<style>
+:root{--bg:#090b0f;--panel:#11151b;--panel2:#181d25;--line:#303741;--red:#c92828;--gold:#d6b56a;--white:#f4f4f4}
+*{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 50% 0,#242933 0,#0a0c10 48%,#050608 100%);color:#eee;font-family:Arial,"Malgun Gothic",sans-serif;min-height:100vh}
+.wrap{max-width:1120px;margin:auto;padding:24px 18px 36px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}
+.logo{letter-spacing:5px;font-weight:900;font-size:30px}.logo b{color:#e33}.sub{font-size:12px;color:#8e96a3;letter-spacing:1px}
+button{border:1px solid #3a424e;background:#202630;color:#fff;border-radius:9px;padding:10px 14px;cursor:pointer;font-weight:700}
+button:hover{filter:brightness(1.15)}button.primary{background:#a91f25;border-color:#d24b4f}
+.layout{display:grid;grid-template-columns:220px minmax(360px,1fr) 220px;gap:16px;align-items:start}
+.card{background:linear-gradient(145deg,#151a21,#0e1217);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 14px 40px #0008}
+.player{min-height:230px}.player.black{border-top:3px solid #888}.player.white{border-top:3px solid #eee}.name{font-size:18px;font-weight:900;margin-bottom:5px}.role{color:#9299a5;font-size:12px}.count{font-size:34px;font-weight:900;margin:20px 0 4px}.small{font-size:12px;color:#9098a5}
+.status{margin-top:15px;padding:10px;border-radius:9px;background:#0a0d11;border:1px solid #252c35;font-size:13px}
+.center{text-align:center}.board-shell{background:#0d1014;border:1px solid #39414b;border-radius:20px;padding:18px;box-shadow:0 20px 55px #0009}
+.turn{display:flex;justify-content:center;gap:8px;align-items:center;margin-bottom:13px;font-size:14px}.dot{width:12px;height:12px;border-radius:50%;display:inline-block;border:1px solid #777}.dot.black{background:#111}.dot.white{background:#f3f3f3}
+.board{width:min(78vw,610px);aspect-ratio:1;margin:auto;display:grid;grid-template-columns:repeat(6,1fr);gap:5px;background:#050608;padding:5px;border-radius:9px}
+.cell{position:relative;background:#262c34;border:1px solid #3c4551;border-radius:5px;display:flex;align-items:center;justify-content:center;cursor:pointer;min-width:0;transition:.12s}
+.cell:hover{background:#333b46}.cell.allowed{box-shadow:inset 0 0 0 3px #d6b56a;background:#3a3528}.cell.selected{box-shadow:inset 0 0 0 4px #c92828}
+.coord{position:absolute;left:5px;top:4px;color:#6f7885;font-size:10px;pointer-events:none}.mine-dot{position:absolute;right:5px;top:3px;width:22px;height:22px;display:none;align-items:center;justify-content:center;font-size:15px;line-height:1;z-index:3;pointer-events:none}.reveal .mine-dot.is-mine{display:flex}.reveal .cell:has(.mine-dot.is-mine){background:linear-gradient(145deg,#4b1c1c,#2a1515);border-color:#d34a4a;box-shadow:inset 0 0 0 2px #b52d2d,0 0 12px #b52d2d66}.reveal .mine-dot.is-mine::after{content:"💣";filter:drop-shadow(0 0 3px #ff4b4b)}
+.chip{width:58%;aspect-ratio:1;border-radius:50%;border:3px solid #555;box-shadow:0 4px 10px #0009;position:relative}
+.chip.black{background:#090a0c;border-color:#666}.chip.white{background:#f5f5f5;border-color:#aaa}.chip.last{outline:3px solid #d6b56a;outline-offset:3px}
+.chip.flip{
+  animation: chipFlip .75s cubic-bezier(.2,.8,.25,1);
+  transform-style:preserve-3d;
+}
+@keyframes chipFlip{
+  0%{transform:rotateY(0deg) scale(1)}
+  22%{transform:rotateY(75deg) scale(1.08)}
+  45%{transform:rotateY(180deg) scale(1.12)}
+  68%{transform:rotateY(285deg) scale(1.06)}
+  100%{transform:rotateY(360deg) scale(1)}
+}
+.mine-hit{
+  animation: mineHit .75s ease-out;
+}
+@keyframes mineHit{
+  0%,100%{box-shadow:inset 0 0 0 1px #3c4551}
+  25%{box-shadow:inset 0 0 0 3px #c92828,0 0 18px #c9282888}
+  55%{box-shadow:inset 0 0 0 4px #e33,0 0 28px #c92828aa}
+}
+.controls{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:14px}.hint{margin-top:12px;color:#8f98a5;font-size:12px;line-height:1.55}
+.rules{margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px}.rulebox{background:#0c0f14;border:1px solid #252c35;border-radius:12px;padding:13px;text-align:left;font-size:12px;line-height:1.7;color:#c0c6cf}
+.rulebox b{color:#fff}.footer{margin-top:18px;color:#69717d;font-size:11px;text-align:center}
+.modal{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}.modal.on{display:flex}.modalbox{max-width:480px;width:100%;background:#13171d;border:1px solid #3a424d;border-radius:16px;padding:22px;text-align:center;box-shadow:0 20px 80px #000}
+.modalbox h2{font-size:28px;margin:0 0 8px}.modalbox p{color:#adb5c0}.winblack{color:#aaa}.winwhite{color:#fff}
+.online-panel{margin-bottom:16px;background:linear-gradient(145deg,#151a21,#0e1217);border:1px solid #303741;border-radius:16px;padding:16px}.online-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.online-row input{flex:1;min-width:160px;background:#0a0d11;color:#fff;border:1px solid #3a424e;border-radius:9px;padding:10px 12px;font-weight:700;letter-spacing:2px;text-transform:uppercase}.room-code{font-size:24px;font-weight:900;letter-spacing:4px;color:#d6b56a}.room-status{margin-top:9px;color:#9da6b2;font-size:12px;line-height:1.5}.role-pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#252c35;font-size:11px;margin-left:5px}.disabled{opacity:.45;pointer-events:none}.online-panel h3{margin:0 0 10px;font-size:15px}@media(max-width:850px){.layout{grid-template-columns:1fr}.player{min-height:auto}.player .status{display:inline-block;margin-top:8px}.board{width:min(92vw,600px)}.rules{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><div class="logo">COLOR <b>TURN</b></div><div class="sub">2 PLAYER · 6 × 6 · 4목 · 18 MINES</div></div>
+    <button class="primary" onclick="newGame()">새 게임</button>
+  </div>
 
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/12.18.0/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/12.18.0/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/12.18.0/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/12.18.0/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/12.18.0/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/12.18.0/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/12.18.0/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/12.18.0/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/12.18.0/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/12.18.0/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
-
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
+  <section class="online-panel">
+    <h3>🌐 친구와 온라인으로 플레이</h3>
+    <div class="online-row">
+      <button class="primary" id="createRoomBtn" onclick="createRoom()">방 만들기</button>
+      <input id="roomInput" maxlength="6" placeholder="방 코드 6자리" autocomplete="off">
+      <button id="joinRoomBtn" onclick="joinRoom()">방 참가</button>
+      <button onclick="leaveRoom()">방 나가기</button>
     </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
+    <div class="room-status" id="roomStatus">온라인 방을 만들거나 친구에게 받은 방 코드를 입력하세요.</div>
+    <div id="roomShare" style="display:none;margin-top:10px">방 코드 <span class="room-code" id="roomCodeText"></span> <button onclick="copyRoomLink()">초대 링크 복사</button></div>
+  </section>
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+  <div class="layout">
+    <div class="card player black">
+      <div class="name">● 검정 플레이어</div><div class="role">상단에서 배치</div>
+      <div class="count" id="blackRemain">7</div><div class="small">미배치 칩</div>
+      <div class="status" id="blackStatus">대기 중</div>
+    </div>
 
-        try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
-        }
-      });
-    </script>
-  </body>
+    <main class="center">
+      <div class="board-shell">
+        <div class="turn"><span id="turnDot" class="dot black"></span><b id="turnText">검정 플레이어의 차례</b></div>
+        <div id="board" class="board"></div>
+        <div class="controls">
+          <button onclick="cancelSelection()">선택 취소</button>
+          <button onclick="revealMines()">지뢰 위치 보기</button>
+          <button onclick="hideMines()">지뢰 숨기기</button>
+        </div>
+        <div class="hint" id="hint">자신의 칩을 놓거나, 보드의 어떤 칩이든 주변 8칸의 빈칸으로 이동하세요.</div>
+      </div>
+      <div class="rules">
+        <div class="rulebox"><b>배치</b><br>검정은 1행, 흰색은 6행의 빈칸에 미배치 칩을 놓습니다.</div>
+        <div class="rulebox"><b>이동</b><br>내 차례에는 내 칩뿐 아니라 상대방 칩도 주변 8칸의 빈칸으로 한 칸 이동할 수 있습니다. 단, 상대가 직전에 이동한 칩은 바로 다시 움직일 수 없습니다.</div>
+        <div class="rulebox"><b>지뢰</b><br>각 행마다 3개씩, 총 18개가 숨겨집니다. 지뢰 칸에 들어가면 칩 색이 뒤집힙니다.</div>
+        <div class="rulebox"><b>승리</b><br>자기 색 칩 4개가 가로·세로·대각선으로 연속되면 즉시 승리합니다.</div>
+      </div>
+    </main>
+
+    <div class="card player white">
+      <div class="name">○ 흰색 플레이어</div><div class="role">하단에서 배치</div>
+      <div class="count" id="whiteRemain">7</div><div class="small">미배치 칩</div>
+      <div class="status" id="whiteStatus">대기 중</div>
+    </div>
+  </div>
+  <div class="footer">방송의 컬러턴 규칙을 2인용 브라우저 게임으로 재현한 비공식 팬 메이드 버전</div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modalbox">
+    <h2 id="winTitle"></h2><p id="winDesc"></p>
+    <button class="primary" onclick="newGame();closeModal()">다시 하기</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, runTransaction, onDisconnect } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDcX87w50KyVbITXTIP_-fWygu7OTIfgGk",
+  authDomain: "colorturn-84131.firebaseapp.com",
+  databaseURL: "https://colorturn-84131-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "colorturn-84131",
+  storageBucket: "colorturn-84131.firebasestorage.app",
+  messagingSenderId: "268332543148",
+  appId: "1:268332543148:web:02127eb7fe1b7c27f8c309"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const N=6, DIRS=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+let board=[], mines=new Set(), turn='black', remaining={black:7,white:7};
+let selected=null, lastMoved=null, lastMoveBy=null, over=false, flipCell=null;
+let roomCode=null, playerColor=null, roomUnsubscribe=null, roomPresenceRef=null, localPlayerId=Math.random().toString(36).slice(2,10);
+let syncing=false, actionLock=false;
+
+function key(r,c){return r+','+c}
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function makeInitialState(){
+  const b=Array.from({length:N},()=>Array(N).fill(null));
+  const m=new Set();
+  for(let r=0;r<N;r++){let cols=shuffle([0,1,2,3,4,5]).slice(0,3);cols.forEach(c=>m.add(key(r,c)))}
+  return {board:b, mines:[...m], turn:'black', remaining:{black:7,white:7}, lastMoved:null, lastMoveBy:null, over:false, winner:null};
+}
+function newGame(){
+  if(roomCode){
+    if(playerColor!=='black'){setHint('방장(검정 플레이어)만 새 게임을 시작할 수 있습니다.');return;}
+    const state=makeInitialState();
+    set(ref(db,`rooms/${roomCode}/state`),state).catch(e=>setHint('새 게임 시작 실패: '+e.message));
+    return;
+  }
+  applyState(makeInitialState());
+  document.body.classList.remove('reveal');
+  render(); updateUI();
+}
+function applyState(state){
+  if(!state)return;
+  board=state.board||Array.from({length:N},()=>Array(N).fill(null));
+  mines=new Set(state.mines||[]);
+  turn=state.turn||'black';
+  remaining=state.remaining||{black:7,white:7};
+  lastMoved=state.lastMoved||null;
+  lastMoveBy=state.lastMoveBy||null;
+  over=!!state.over;
+  if(over) document.body.classList.add('reveal');
+  else document.body.classList.remove('reveal');
+  selected=null;
+  render(); updateUI();
+  if(over && state.winner) showWinner(state.winner);
+}
+function setRoomStatus(text){document.getElementById('roomStatus').textContent=text}
+function randomRoomCode(){return Math.random().toString(36).slice(2,8).toUpperCase()}
+function updateRoomUI(){
+  const create=document.getElementById('createRoomBtn'),join=document.getElementById('joinRoomBtn'),input=document.getElementById('roomInput');
+  if(roomCode){
+    document.getElementById('roomShare').style.display='block';
+    document.getElementById('roomCodeText').textContent=roomCode;
+    input.value=roomCode;
+    create.disabled=true; join.disabled=true; input.disabled=true;
+  }else{
+    document.getElementById('roomShare').style.display='none';
+    create.disabled=false; join.disabled=false; input.disabled=false;
+  }
+}
+async function createRoom(){
+  if(roomCode){return}
+  const code=randomRoomCode();
+  const initial=makeInitialState();
+  try{
+    const roomRef=ref(db,`rooms/${code}`);
+    const snap=await get(roomRef);
+    if(snap.exists()){return createRoom();}
+    await set(roomRef,{players:{black:localPlayerId,white:null},state:initial});
+    roomCode=code; playerColor='black';
+    history.replaceState(null,'',location.pathname+location.search+'#room='+code);
+    listenRoom();
+    setRoomStatus('방 생성 완료 · 당신은 검정 플레이어입니다. 친구에게 방 코드를 보내세요.');
+    updateRoomUI();
+  }catch(e){setRoomStatus('방 생성 실패: '+e.message)}
+}
+async function joinRoom(){
+  if(roomCode)return;
+  const code=document.getElementById('roomInput').value.trim().toUpperCase();
+  if(!/^[A-Z0-9]{6}$/.test(code)){setRoomStatus('6자리 방 코드를 정확히 입력하세요.');return}
+  try{
+    const roomRef=ref(db,`rooms/${code}`);
+    const snap=await get(roomRef);
+    if(!snap.exists()){setRoomStatus('존재하지 않는 방입니다.');return}
+    const room=snap.val();
+    if(room.players?.black===localPlayerId || room.players?.white===localPlayerId){playerColor=room.players.black===localPlayerId?'black':'white'}
+    else if(!room.players?.white){
+      await set(ref(db,`rooms/${code}/players/white`),localPlayerId);
+      playerColor='white';
+    }else{setRoomStatus('이미 두 명이 참가한 방입니다.');return}
+    roomCode=code;
+    history.replaceState(null,'',location.pathname+location.search+'#room='+code);
+    listenRoom();
+    setRoomStatus('방 참가 완료 · 당신은 흰색 플레이어입니다.');
+    updateRoomUI();
+  }catch(e){setRoomStatus('방 참가 실패: '+e.message)}
+}
+function listenRoom(){
+  if(roomUnsubscribe)roomUnsubscribe();
+  const roomRef=ref(db,`rooms/${roomCode}`);
+  roomUnsubscribe=onValue(roomRef,snap=>{
+    if(!snap.exists()){setRoomStatus('방이 삭제되었습니다.');leaveRoom(false);return}
+    const room=snap.val();
+    if(room.players?.black===localPlayerId)playerColor='black';
+    else if(room.players?.white===localPlayerId)playerColor='white';
+    else if(!playerColor){setRoomStatus('이 방의 참가자가 아닙니다.');return}
+    applyState(room.state);
+    const opponent=playerColor==='black'?room.players?.white:room.players?.black;
+    setRoomStatus(opponent?`온라인 · ${playerColor==='black'?'검정':'흰색'} 플레이어 · 상대방 연결됨`:`온라인 · ${playerColor==='black'?'검정':'흰색'} 플레이어 · 친구 입장을 기다리는 중`);
+    updateRoomUI();
+  });
+}
+async function leaveRoom(removePresence=true){
+  if(roomUnsubscribe){roomUnsubscribe();roomUnsubscribe=null}
+  if(roomCode && removePresence){
+    try{
+      const roomSnap=await get(ref(db,`rooms/${roomCode}`));
+      if(roomSnap.exists()){
+        const room=roomSnap.val();
+        if(playerColor==='white') await set(ref(db,`rooms/${roomCode}/players/white`),null);
+        else if(playerColor==='black') await set(ref(db,`rooms/${roomCode}/players/black`),null);
+      }
+    }catch(e){}
+  }
+  roomCode=null; playerColor=null; selected=null; actionLock=false;
+  history.replaceState(null,'',location.pathname+location.search);
+  setRoomStatus('온라인 방을 만들거나 친구에게 받은 방 코드를 입력하세요.');
+  updateRoomUI();
+  newGame();
+}
+async function copyRoomLink(){
+  if(!roomCode)return;
+  const url=location.origin+location.pathname+'#room='+roomCode;
+  try{await navigator.clipboard.writeText(url);setRoomStatus('초대 링크를 복사했습니다. 친구에게 보내세요.')}catch(e){setRoomStatus('복사 실패 · 방 코드 '+roomCode+' 를 친구에게 보내세요.')}
+}
+function checkOnlineTurn(){
+  if(!roomCode)return true;
+  if(!playerColor){setHint('먼저 방을 만들거나 참가하세요.');return false}
+  if(turn!==playerColor){setHint('상대방의 차례입니다.');return false}
+  if(actionLock){return false}
+  return true;
+}
+function render(){
+  const el=document.getElementById('board');el.innerHTML='';
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    const cell=document.createElement('div');cell.className='cell';cell.dataset.r=r;cell.dataset.c=c;
+    const co=document.createElement('span');co.className='coord';co.textContent=String.fromCharCode(65+c)+(r+1);cell.appendChild(co);
+    const md=document.createElement('span');md.className='mine-dot'+(mines.has(key(r,c))?' is-mine':'');md.setAttribute('aria-label','지뢰');cell.appendChild(md);
+    const piece=board[r][c];
+    if(piece){const chip=document.createElement('div');chip.className='chip '+piece.color+(lastMoved&&lastMoved.r===r&&lastMoved.c===c?' last':'')+(flipCell&&flipCell.r===r&&flipCell.c===c?' flip':'');cell.appendChild(chip)}
+    if(flipCell&&flipCell.r===r&&flipCell.c===c)cell.classList.add('mine-hit');
+    if(selected&&selected.r===r&&selected.c===c)cell.classList.add('selected');
+    if(isAllowedCell(r,c))cell.classList.add('allowed');
+    cell.onclick=()=>clickCell(r,c);el.appendChild(cell);
+  }
+}
+function isAllowedCell(r,c){
+  if(over)return false;
+  if(selected)return board[r][c]===null && Math.max(Math.abs(r-selected.r),Math.abs(c-selected.c))===1;
+  return board[r][c]===null && remaining[turn]>0 && ((turn==='black'&&r===0)||(turn==='white'&&r===N-1));
+}
+function clickCell(r,c){
+  if(over)return;
+  if(!checkOnlineTurn())return;
+  if(selected){
+    if(board[r][c]===null && Math.max(Math.abs(r-selected.r),Math.abs(c-selected.c))===1){
+      movePiece(selected.r,selected.c,r,c);return;
+    }
+    if(board[r][c]){
+      if(lastMoveBy!==turn && lastMoved&&lastMoved.r===r&&lastMoved.c===c){
+        setHint('상대가 직전에 이동한 칩은 바로 다시 움직일 수 없습니다.');return;
+      }
+      selected={r,c};render();return;
+    }
+    cancelSelection();return;
+  }
+  if(board[r][c]){
+    if(lastMoveBy!==turn && lastMoved&&lastMoved.r===r&&lastMoved.c===c){setHint('상대가 직전에 이동한 칩은 바로 다시 움직일 수 없습니다.');return}
+    selected={r,c};render();return;
+  }
+  if(board[r][c]===null && remaining[turn]>0 && ((turn==='black'&&r===0)||(turn==='white'&&r===N-1))){
+    placePiece(r,c);
+  }
+}
+async function commitState(next){
+  if(!roomCode){applyState(next);return true}
+  actionLock=true;
+  try{
+    await set(ref(db,`rooms/${roomCode}/state`),next);
+    return true;
+  }catch(e){setHint('동기화 실패: '+e.message);return false}
+  finally{actionLock=false}
+}
+async function placePiece(r,c){
+  if(!checkOnlineTurn())return;
+  const next=serializeState();
+  next.board[r][c]={color:turn};
+  next.remaining[turn]--;
+  next.lastMoved=null; next.lastMoveBy=null;
+  const hitMine=next.mines.includes(key(r,c));
+  if(hitMine)next.board[r][c].color=next.board[r][c].color==='black'?'white':'black';
+  const winner=checkWinnerOnBoard(next.board,next.board[r][c]?.color);
+  next.over=!!winner; next.winner=winner||null;
+  if(!winner)next.turn=turn==='black'?'white':'black';
+  if(winner)document.body.classList.add('reveal');
+  if(hitMine){flipCell={r,c};setHint('💥 지뢰! 칩의 색이 뒤집힙니다.')}
+  const ok=await commitState(next);
+  if(ok && hitMine)setTimeout(()=>{flipCell=null;render()},760);
+}
+async function movePiece(sr,sc,r,c){
+  if(!checkOnlineTurn())return;
+  const next=serializeState();
+  const p=next.board[sr][sc];
+  if(!p || next.board[r][c]!==null)return;
+  next.board[sr][sc]=null; next.board[r][c]=p;
+  next.lastMoved={r,c}; next.lastMoveBy=turn;
+  const hitMine=next.mines.includes(key(r,c));
+  if(hitMine)next.board[r][c].color=next.board[r][c].color==='black'?'white':'black';
+  const winner=checkWinnerOnBoard(next.board,next.board[r][c]?.color);
+  next.over=!!winner; next.winner=winner||null;
+  if(!winner)next.turn=turn==='black'?'white':'black';
+  selected=null;
+  if(hitMine){flipCell={r,c};setHint('💥 지뢰! 칩의 색이 뒤집힙니다.')}
+  const ok=await commitState(next);
+  if(ok && hitMine)setTimeout(()=>{flipCell=null;render()},760);
+}
+function serializeState(){return {board:board.map(row=>row.map(p=>p?{color:p.color}:null)),mines:[...mines],turn,remaining:{...remaining},lastMoved:lastMoved?{...lastMoved}:null,lastMoveBy,over,winner:null}}
+function checkWinnerOnBoard(b,color){
+  if(!color)return null;
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++)for(const [dr,dc] of [[1,0],[0,1],[1,1],[1,-1]]){
+    let ok=true;for(let k=0;k<4;k++){let rr=r+dr*k,cc=c+dc*k;if(rr<0||rr>=N||cc<0||cc>=N||!b[rr][cc]||b[rr][cc].color!==color){ok=false;break}}
+    if(ok)return color;
+  }return null;
+}
+
+function checkWinner(color){return checkWinnerOnBoard(board,color)}
+
+function cancelSelection(){selected=null;render();setHint('자신의 칩을 놓거나, 보드의 어떤 칩이든 주변 8칸의 빈칸으로 이동하세요.')}
+function updateUI(){
+  document.getElementById('blackRemain').textContent=remaining.black;
+  document.getElementById('whiteRemain').textContent=remaining.white;
+  document.getElementById('blackStatus').textContent=over?'게임 종료':(roomCode?(playerColor==='black'?'내 색 · '+(turn==='black'?'YOUR TURN':'대기 중'):'상대 색 · '+(turn==='black'?'상대 차례':'대기 중')):(turn==='black'?'YOUR TURN':'대기 중'));
+  document.getElementById('whiteStatus').textContent=over?'게임 종료':(roomCode?(playerColor==='white'?'내 색 · '+(turn==='white'?'YOUR TURN':'대기 중'):'상대 색 · '+(turn==='white'?'상대 차례':'대기 중')):(turn==='white'?'YOUR TURN':'대기 중'));
+  document.getElementById('turnText').textContent=over?'게임 종료':(turn==='black'?'검정 플레이어의 차례':'흰색 플레이어의 차례');
+  document.getElementById('turnDot').className='dot '+turn;
+}
+function setHint(t){document.getElementById('hint').textContent=t}
+function revealMines(){document.body.classList.add('reveal');render();setHint('💣 지뢰 위치가 모두 공개되었습니다.')}
+function hideMines(){if(over)return;document.body.classList.remove('reveal');render();setHint('지뢰 위치는 숨겨져 있습니다. 기억해 두세요!')}
+function showWinner(w){
+  document.getElementById('winTitle').textContent=(w==='black'?'검정':'흰색')+' 플레이어 승리!';
+  document.getElementById('winTitle').className=w==='black'?'winblack':'winwhite';
+  document.getElementById('winDesc').textContent='자기 색 칩 4개를 가로·세로·대각선으로 연결했습니다.\n\n💣 게임이 종료되어 보드 위에 지뢰 위치가 표시됩니다.';
+  document.getElementById('modal').classList.add('on');
+}
+function closeModal(){document.getElementById('modal').classList.remove('on')}
+Object.assign(window,{createRoom,joinRoom,leaveRoom,copyRoomLink,newGame,cancelSelection,revealMines,hideMines,closeModal});
+updateRoomUI();
+(function initFromUrl(){
+  const m=location.hash.match(/^#room=([A-Za-z0-9]{6})$/);
+  if(m){document.getElementById('roomInput').value=m[1].toUpperCase();setRoomStatus('초대 링크를 통해 들어왔습니다. 방 참가를 눌러주세요.')}
+  newGame();
+})();
+</script>
+</body>
 </html>
