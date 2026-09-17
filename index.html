@@ -11,18 +11,19 @@
 .logo{letter-spacing:5px;font-weight:900;font-size:30px}.logo b{color:#e33}.sub{font-size:12px;color:#8e96a3;letter-spacing:1px}
 button{border:1px solid #3a424e;background:#202630;color:#fff;border-radius:9px;padding:10px 14px;cursor:pointer;font-weight:700}
 button:hover{filter:brightness(1.15)}button.primary{background:#a91f25;border-color:#d24b4f}
-.layout{display:grid;grid-template-columns:220px minmax(360px,1fr) 220px;gap:16px;align-items:start}
+.layout{display:grid;grid-template-columns:200px minmax(0,1fr) 200px;gap:16px;align-items:start}
 .card{background:linear-gradient(145deg,#151a21,#0e1217);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 14px 40px #0008}
 .player{min-height:230px}.player.black{border-top:3px solid #888}.player.white{border-top:3px solid #eee}.name{font-size:18px;font-weight:900;margin-bottom:5px}.role{color:#9299a5;font-size:12px}.count{font-size:34px;font-weight:900;margin:20px 0 4px}.small{font-size:12px;color:#9098a5}
 .status{margin-top:15px;padding:10px;border-radius:9px;background:#0a0d11;border:1px solid #252c35;font-size:13px}
-.center{text-align:center}.board-shell{background:#0d1014;border:1px solid #39414b;border-radius:20px;padding:18px;box-shadow:0 20px 55px #0009}
+.center{text-align:center;min-width:0}.board-shell{background:#0d1014;border:1px solid #39414b;border-radius:20px;padding:18px;box-shadow:0 20px 55px #0009}
 .turn{display:flex;justify-content:center;gap:8px;align-items:center;margin-bottom:13px;font-size:14px}.dot{width:12px;height:12px;border-radius:50%;display:inline-block;border:1px solid #777}.dot.black{background:#111}.dot.white{background:#f3f3f3}
-.board{width:min(78vw,610px);aspect-ratio:1;margin:auto;display:grid;grid-template-columns:repeat(6,1fr);gap:5px;background:#050608;padding:5px;border-radius:9px}
-.cell{position:relative;background:#262c34;border:1px solid #3c4551;border-radius:5px;display:flex;align-items:center;justify-content:center;cursor:pointer;min-width:0;transition:.12s}
+.board-frame{width:100%;max-width:640px;margin:0 auto;aspect-ratio:1/1;position:relative}
+.board{position:absolute;inset:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(6,minmax(0,1fr));gap:5px;background:#050608;padding:5px;border-radius:9px;overflow:hidden}
+.cell{position:relative;background:#262c34;border:1px solid #3c4551;border-radius:5px;display:flex;align-items:center;justify-content:center;cursor:pointer;min-width:0;min-height:0;overflow:hidden;transition:background .12s,box-shadow .12s}
 .cell:hover{background:#333b46}.cell.allowed{box-shadow:inset 0 0 0 3px #d6b56a;background:#3a3528}.cell.selected{box-shadow:inset 0 0 0 4px #c92828}
-.coord{position:absolute;left:5px;top:4px;color:#6f7885;font-size:10px;pointer-events:none}.mine-dot{position:absolute;right:5px;top:3px;width:22px;height:22px;display:none;align-items:center;justify-content:center;font-size:15px;line-height:1;z-index:3;pointer-events:none}.reveal .mine-dot.is-mine{display:flex}.reveal .cell:has(.mine-dot.is-mine){background:linear-gradient(145deg,#4b1c1c,#2a1515);border-color:#d34a4a;box-shadow:inset 0 0 0 2px #b52d2d,0 0 12px #b52d2d66}.reveal .mine-dot.is-mine::after{content:"💣";filter:drop-shadow(0 0 3px #ff4b4b)}
-.chip{width:58%;aspect-ratio:1;border-radius:50%;border:3px solid #555;box-shadow:0 4px 10px #0009;position:relative}
-.chip.black{background:#090a0c;border-color:#666}.chip.white{background:#f5f5f5;border-color:#aaa}.chip.last{outline:3px solid #d6b56a;outline-offset:3px}
+.coord{position:absolute;left:5px;top:4px;color:#6f7885;font-size:10px;pointer-events:none;z-index:1}.mine-dot{position:absolute;right:5px;top:3px;width:22px;height:22px;display:none;align-items:center;justify-content:center;font-size:15px;line-height:1;z-index:3;pointer-events:none}.reveal .mine-dot.is-mine{display:flex}.reveal .cell:has(.mine-dot.is-mine){background:linear-gradient(145deg,#4b1c1c,#2a1515);border-color:#d34a4a;box-shadow:inset 0 0 0 2px #b52d2d,0 0 12px #b52d2d66}.reveal .mine-dot.is-mine::after{content:"💣";filter:drop-shadow(0 0 3px #ff4b4b)}
+.chip{width:58%;height:58%;border-radius:50%;border:3px solid #555;box-shadow:0 4px 10px #0009;position:relative;flex:0 0 auto;box-sizing:border-box}
+.chip.black{background:#090a0c;border-color:#666}.chip.white{background:#f5f5f5;border-color:#aaa}.chip.last{box-shadow:0 0 0 3px #d6b56a,0 4px 10px #0009}
 .chip.flip{
   animation: chipFlip .75s cubic-bezier(.2,.8,.25,1);
   transform-style:preserve-3d;
@@ -47,7 +48,9 @@ button:hover{filter:brightness(1.15)}button.primary{background:#a91f25;border-co
 .rulebox b{color:#fff}.footer{margin-top:18px;color:#69717d;font-size:11px;text-align:center}
 .modal{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}.modal.on{display:flex}.modalbox{max-width:480px;width:100%;background:#13171d;border:1px solid #3a424d;border-radius:16px;padding:22px;text-align:center;box-shadow:0 20px 80px #000}
 .modalbox h2{font-size:28px;margin:0 0 8px}.modalbox p{color:#adb5c0}.winblack{color:#aaa}.winwhite{color:#fff}
-.online-panel{margin-bottom:16px;background:linear-gradient(145deg,#151a21,#0e1217);border:1px solid #303741;border-radius:16px;padding:16px}.online-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.online-row input{flex:1;min-width:160px;background:#0a0d11;color:#fff;border:1px solid #3a424e;border-radius:9px;padding:10px 12px;font-weight:700;letter-spacing:2px;text-transform:uppercase}.room-code{font-size:24px;font-weight:900;letter-spacing:4px;color:#d6b56a}.room-status{margin-top:9px;color:#9da6b2;font-size:12px;line-height:1.5}.role-pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#252c35;font-size:11px;margin-left:5px}.disabled{opacity:.45;pointer-events:none}.online-panel h3{margin:0 0 10px;font-size:15px}@media(max-width:850px){.layout{grid-template-columns:1fr}.player{min-height:auto}.player .status{display:inline-block;margin-top:8px}.board{width:min(92vw,600px)}.rules{grid-template-columns:1fr}}
+.modal-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}.modal-actions button{min-width:140px}.modal-input{width:100%;margin-top:16px;background:#0a0d11;color:#fff;border:1px solid #3a424e;border-radius:9px;padding:12px 14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-align:center;font-size:16px}
+.modal-input::placeholder{letter-spacing:1px;text-transform:none;font-weight:600;color:#6f7885}
+.online-panel{margin-bottom:16px;background:linear-gradient(145deg,#151a21,#0e1217);border:1px solid #303741;border-radius:16px;padding:16px;display:none}.online-panel.on{display:block}.online-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.room-code{font-size:24px;font-weight:900;letter-spacing:4px;color:#d6b56a}.room-status{margin-top:9px;color:#9da6b2;font-size:12px;line-height:1.5}.disabled{opacity:.45;pointer-events:none}.online-panel h3{margin:0 0 10px;font-size:15px}button:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}@media(max-width:850px){.layout{grid-template-columns:1fr}.player{min-height:auto}.player .status{display:inline-block;margin-top:8px}.board-frame{max-width:min(94vw,640px)}.rules{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -57,17 +60,15 @@ button:hover{filter:brightness(1.15)}button.primary{background:#a91f25;border-co
     <button class="primary" onclick="newGame()">새 게임</button>
   </div>
 
-  <section class="online-panel">
+  <section class="online-panel" id="onlinePanel">
     <h3>🌐 친구와 온라인으로 플레이</h3>
     <div class="online-row">
-      <button class="primary" id="createRoomBtn" onclick="createRoom()">방 만들기</button>
-      <input id="roomInput" maxlength="6" placeholder="방 코드 6자리" autocomplete="off">
-      <button id="joinRoomBtn" onclick="joinRoom()">방 참가</button>
+      <button class="primary" id="startGameBtn" onclick="startOnlineGame()" disabled>게임 시작</button>
       <button onclick="leaveRoom()">방 나가기</button>
-      <button class="primary" id="startGameBtn" onclick="startOnlineGame()" style="display:none">게임 시작</button>
+      <button onclick="copyRoomLink()" id="copyLinkBtn" style="display:none">초대 링크 복사</button>
     </div>
     <div class="room-status" id="roomStatus">온라인 방을 만들거나 친구에게 받은 방 코드를 입력하세요.</div>
-    <div id="roomShare" style="display:none;margin-top:10px">방 코드 <span class="room-code" id="roomCodeText"></span> <button onclick="copyRoomLink()">초대 링크 복사</button></div>
+    <div id="roomShare" style="display:none;margin-top:10px">방 코드 <span class="room-code" id="roomCodeText"></span></div>
   </section>
 
   <div class="layout">
@@ -80,7 +81,7 @@ button:hover{filter:brightness(1.15)}button.primary{background:#a91f25;border-co
     <main class="center">
       <div class="board-shell">
         <div class="turn"><span id="turnDot" class="dot black"></span><b id="turnText">검정 플레이어의 차례</b></div>
-        <div id="board" class="board"></div>
+        <div class="board-frame"><div id="board" class="board"></div></div>
         <div class="controls">
           <button onclick="cancelSelection()">선택 취소</button>
           <button onclick="revealMines()">지뢰 위치 보기</button>
@@ -112,6 +113,51 @@ button:hover{filter:brightness(1.15)}button.primary{background:#a91f25;border-co
   </div>
 </div>
 
+<div class="modal on" id="modeModal">
+  <div class="modalbox">
+    <h2>플레이 방식</h2>
+    <p>혼자 연습할지, 친구와 함께할지 선택하세요.</p>
+    <div class="modal-actions">
+      <button class="primary" onclick="chooseTogether()">함께하기</button>
+      <button onclick="chooseSolo()">혼자하기</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="roomModal">
+  <div class="modalbox">
+    <h2>온라인 방</h2>
+    <p>초대 코드를 입력해 참가하거나, 새 방을 만드세요.</p>
+    <input class="modal-input" id="roomInput" maxlength="6" placeholder="초대 코드 6자리" autocomplete="off">
+    <div class="modal-actions">
+      <button class="primary" id="createRoomBtn" onclick="createRoom()">방 만들기</button>
+      <button id="joinRoomBtn" onclick="joinRoom()">방 참가하기</button>
+    </div>
+    <p id="roomModalStatus" style="margin-top:12px;font-size:12px;color:#9da6b2;min-height:18px"></p>
+    <div class="modal-actions" style="margin-top:10px">
+      <button onclick="backToModeSelect()">뒤로</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="waitingModal">
+  <div class="modalbox">
+    <h2>친구 기다리는 중</h2>
+    <p id="waitingMessage">친구를 기다리는 중입니다...</p>
+    <div style="margin-top:16px;padding:14px;background:#0a0d11;border:1px solid #303741;border-radius:12px">
+      <div style="font-size:12px;color:#8e96a3;margin-bottom:6px">방 코드</div>
+      <div class="room-code" id="waitingRoomCode">------</div>
+      <div style="font-size:12px;color:#8e96a3;margin:14px 0 6px">초대 링크</div>
+      <div id="waitingInviteLink" style="font-size:12px;color:#d6b56a;word-break:break-all;line-height:1.5"></div>
+    </div>
+    <p id="waitingCopyStatus" style="margin-top:10px;font-size:12px;color:#9da6b2;min-height:18px"></p>
+    <div class="modal-actions">
+      <button class="primary" onclick="copyRoomLink()">초대 링크 복사</button>
+      <button onclick="leaveRoom()">방 취소</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
 import { getDatabase, ref, set, get, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
@@ -132,6 +178,7 @@ const N=6, DIRS=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
 let board=[], mines=new Set(), turn='black', remaining={black:7,white:7};
 let selected=null, lastMoved=null, lastMoveBy=null, over=false, flipCell=null, shownWinner=null;
 let onlineStarted=false;
+let playMode=null; // 'solo' | 'online'
 let roomCode=null, playerColor=null, roomUnsubscribe=null, localPlayerId=sessionStorage.getItem('colorTurnPlayerId')||Math.random().toString(36).slice(2,10); sessionStorage.setItem('colorTurnPlayerId',localPlayerId);
 let actionLock=false;
 
@@ -172,32 +219,108 @@ function applyState(state){
   render(); updateUI();
   if(over && state.winner && shownWinner!==state.winner){shownWinner=state.winner;showWinner(state.winner)}
 }
-function setRoomStatus(text){document.getElementById('roomStatus').textContent=text}
+function setRoomStatus(text){
+  document.getElementById('roomStatus').textContent=text;
+  const modalStatus=document.getElementById('roomModalStatus');
+  if(modalStatus) modalStatus.textContent=text;
+}
 function randomRoomCode(){return Math.random().toString(36).slice(2,8).toUpperCase()}
+function showModal(id){document.getElementById(id).classList.add('on')}
+function hideModal(id){document.getElementById(id).classList.remove('on')}
+function setOnlinePanelVisible(on){
+  document.getElementById('onlinePanel').classList.toggle('on', !!on);
+}
+function chooseSolo(){
+  playMode='solo';
+  hideModal('modeModal');
+  hideModal('roomModal');
+  hideModal('waitingModal');
+  setOnlinePanelVisible(false);
+  applyState(makeInitialState());
+  document.body.classList.remove('reveal');
+  render(); updateUI();
+  setHint('혼자하기 모드입니다. 같은 기기에서 번갈아 플레이하세요.');
+}
+function chooseTogether(){
+  playMode='online';
+  hideModal('modeModal');
+  hideModal('waitingModal');
+  showModal('roomModal');
+  setOnlinePanelVisible(false);
+  const input=document.getElementById('roomInput');
+  input.focus();
+}
+function backToModeSelect(){
+  if(roomCode)return;
+  hideModal('roomModal');
+  hideModal('waitingModal');
+  showModal('modeModal');
+  playMode=null;
+}
+function inviteUrl(){
+  if(!roomCode)return '';
+  return location.origin+location.pathname+location.search+'#room='+roomCode;
+}
+function showWaitingModal(){
+  document.getElementById('waitingRoomCode').textContent=roomCode||'------';
+  document.getElementById('waitingInviteLink').textContent=inviteUrl();
+  document.getElementById('waitingMessage').textContent='친구를 기다리는 중입니다...';
+  hideModal('roomModal');
+  hideModal('modeModal');
+  showModal('waitingModal');
+  setOnlinePanelVisible(false);
+}
 function updateRoomUI(room=null){
   const create=document.getElementById('createRoomBtn');
   const join=document.getElementById('joinRoomBtn');
   const input=document.getElementById('roomInput');
   const startBtn=document.getElementById('startGameBtn');
+  const copyBtn=document.getElementById('copyLinkBtn');
 
   if(roomCode){
     document.getElementById('roomShare').style.display='block';
     document.getElementById('roomCodeText').textContent=roomCode;
-    input.value=roomCode;
-    create.disabled=true;
-    join.disabled=true;
-    input.disabled=true;
+    if(input) input.value=roomCode;
+    if(create) create.disabled=true;
+    if(join) join.disabled=true;
+    if(input) input.disabled=true;
 
     const hasOpponent=room ? !!(playerColor==='black'?room.players?.white:room.players?.black) : false;
     const started=room ? room.started===true : onlineStarted;
-    startBtn.style.display=(playerColor==='black' && hasOpponent && !started)?'inline-block':'none';
-    startBtn.disabled=!(playerColor==='black' && hasOpponent && !started);
+
+    // 방장 + 상대 미입장: 대기 알림창 유지 (게임 화면으로 가지 않음)
+    if(playerColor==='black' && !hasOpponent && !started){
+      showWaitingModal();
+      startBtn.style.display='none';
+      startBtn.disabled=true;
+      if(copyBtn) copyBtn.style.display='none';
+      return;
+    }
+
+    hideModal('waitingModal');
+    hideModal('roomModal');
+    hideModal('modeModal');
+    setOnlinePanelVisible(true);
+    if(copyBtn) copyBtn.style.display='inline-block';
+
+    if(playerColor==='black' && !started){
+      startBtn.style.display='inline-block';
+      startBtn.disabled=!hasOpponent;
+      startBtn.title=hasOpponent?'게임을 시작합니다.':'상대가 참가하면 시작할 수 있습니다.';
+    }else{
+      startBtn.style.display='none';
+      startBtn.disabled=true;
+    }
   }else{
     document.getElementById('roomShare').style.display='none';
-    create.disabled=false;
-    join.disabled=false;
-    input.disabled=false;
+    if(create) create.disabled=false;
+    if(join) join.disabled=false;
+    if(input) input.disabled=false;
     startBtn.style.display='none';
+    startBtn.disabled=true;
+    if(copyBtn) copyBtn.style.display='none';
+    hideModal('waitingModal');
+    if(playMode==='online') setOnlinePanelVisible(false);
   }
 }
 
@@ -216,19 +339,24 @@ async function createRoom(){
       });
       if(result.committed)createdCode=code;
     }
-    if(!createdCode){setRoomStatus('방 생성에 실패했습니다. 다시 시도하세요.');return}
+    if(!createdCode){setRoomStatus('방 생성에 실패했습니다. 다시 시도하세요.');showModal('roomModal');return}
+    playMode='online';
     roomCode=createdCode; playerColor='black';
     history.replaceState(null,'',location.pathname+location.search+'#room='+createdCode);
     listenRoom();
-    setRoomStatus('방 생성 완료 · 당신은 검정 플레이어입니다. 친구에게 방 코드를 보내세요.');
+    showWaitingModal();
+    setRoomStatus('친구를 기다리는 중입니다...');
+    document.getElementById('waitingCopyStatus').textContent='';
+    // 방 만들자마자 초대 링크를 클립보드에 복사 시도
+    copyRoomLink();
     updateRoomUI();
-  }catch(e){setRoomStatus('방 생성 실패: '+e.message)}
+  }catch(e){setRoomStatus('방 생성 실패: '+e.message);showModal('roomModal')}
   finally{createBtn.disabled=!!roomCode}
 }
 async function joinRoom(){
   if(roomCode)return;
   const code=document.getElementById('roomInput').value.trim().toUpperCase();
-  if(!/^[A-Z0-9]{6}$/.test(code)){setRoomStatus('6자리 방 코드를 정확히 입력하세요.');return}
+  if(!/^[A-Z0-9]{6}$/.test(code)){setRoomStatus('6자리 초대 코드를 정확히 입력하세요.');return}
   const joinBtn=document.getElementById('joinRoomBtn');
   joinBtn.disabled=true;
   try{
@@ -255,6 +383,7 @@ async function joinRoom(){
       return;
     }
 
+    playMode='online';
     roomCode=code;
     playerColor=assigned;
     history.replaceState(null,'',location.pathname+location.search+'#room='+code);
@@ -292,14 +421,19 @@ function listenRoom(){
     const opponent=playerColor==='black'?room.players?.white:room.players?.black;
 
     if(!opponent){
-      setRoomStatus('친구가 입장할 때까지 기다리는 중입니다.');
-      setHint('친구 입장을 기다리고 있습니다. 친구에게 방 코드를 보내주세요.');
+      if(playerColor==='black'){
+        document.getElementById('waitingMessage').textContent='친구를 기다리는 중입니다...';
+        setRoomStatus('친구를 기다리는 중입니다...');
+      }else{
+        setRoomStatus('친구가 입장할 때까지 기다리는 중입니다.');
+        setHint('친구 입장을 기다리고 있습니다.');
+      }
     }else if(!onlineStarted){
       if(playerColor==='black'){
-        setRoomStatus('친구가 입장했습니다. 방장이 「게임 시작」을 눌러주세요.');
+        setRoomStatus('친구가 입장했습니다. 「게임 시작」을 눌러주세요.');
         setHint('두 명이 모두 입장했습니다. 방장이 게임을 시작할 수 있습니다.');
       }else{
-        setRoomStatus('친구가 입장했습니다. 방장이 게임 시작하기를 기다리는 중입니다.');
+        setRoomStatus('방장이 게임 시작하기를 기다리는 중입니다.');
         setHint('방장이 「게임 시작」을 누르면 게임이 시작됩니다.');
       }
     }else{
@@ -356,16 +490,30 @@ async function leaveRoom(removePresence=true){
       setRoomStatus('방 나가기 처리 중 오류가 발생했습니다.');
     }
   }
-  roomCode=null; playerColor=null; selected=null; actionLock=false; onlineStarted=false;
+  roomCode=null; playerColor=null; selected=null; actionLock=false; onlineStarted=false; playMode=null;
   history.replaceState(null,'',location.pathname+location.search);
   setRoomStatus('온라인 방을 만들거나 친구에게 받은 방 코드를 입력하세요.');
+  hideModal('waitingModal');
+  hideModal('roomModal');
   updateRoomUI();
+  setOnlinePanelVisible(false);
   applyState(makeInitialState());
+  showModal('modeModal');
 }
 async function copyRoomLink(){
   if(!roomCode)return;
-  const url=location.origin+location.pathname+'#room='+roomCode;
-  try{await navigator.clipboard.writeText(url);setRoomStatus('초대 링크를 복사했습니다. 친구에게 보내세요.')}catch(e){setRoomStatus('복사 실패 · 방 코드 '+roomCode+' 를 친구에게 보내세요.')}
+  const url=inviteUrl();
+  const statusEl=document.getElementById('waitingCopyStatus');
+  try{
+    await navigator.clipboard.writeText(url);
+    const msg='초대 링크를 복사했습니다. 친구에게 보내세요.';
+    setRoomStatus(msg);
+    if(statusEl) statusEl.textContent=msg;
+  }catch(e){
+    const msg='복사 실패 · 방 코드 '+roomCode+' 또는 아래 링크를 직접 복사하세요.';
+    setRoomStatus(msg);
+    if(statusEl) statusEl.textContent=msg;
+  }
 }
 function checkOnlineTurn(){
   if(!roomCode)return true;
@@ -497,12 +645,19 @@ function showWinner(w){
   document.getElementById('modal').classList.add('on');
 }
 function closeModal(){document.getElementById('modal').classList.remove('on')}
-Object.assign(window,{createRoom,joinRoom,leaveRoom,copyRoomLink,newGame,cancelSelection,revealMines,hideMines,closeModal});
+Object.assign(window,{createRoom,joinRoom,leaveRoom,copyRoomLink,startOnlineGame,newGame,cancelSelection,revealMines,hideMines,closeModal,chooseSolo,chooseTogether,backToModeSelect});
 updateRoomUI();
 (function initFromUrl(){
   const m=location.hash.match(/^#room=([A-Za-z0-9]{6})$/);
-  if(m){document.getElementById('roomInput').value=m[1].toUpperCase();setRoomStatus('초대 링크를 통해 들어왔습니다. 방 참가를 눌러주세요.')}
-  newGame();
+  applyState(makeInitialState());
+  render(); updateUI();
+  if(m){
+    playMode='online';
+    hideModal('modeModal');
+    showModal('roomModal');
+    document.getElementById('roomInput').value=m[1].toUpperCase();
+    setRoomStatus('초대 링크를 통해 들어왔습니다. 방 참가하기를 눌러주세요.');
+  }
 })();
 </script>
 </body>
